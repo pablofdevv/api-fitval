@@ -1,8 +1,10 @@
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
+import { existsSync } from 'node:fs';
 import { AppModule } from './app.module';
 
-process.loadEnvFile(); // lee el .env y guarda sus valores en process.env
+// Lee el .env si existe (en local). En Render no hay .env: las variables ya vienen en process.env
+if (existsSync('.env')) process.loadEnvFile();
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -18,6 +20,11 @@ async function bootstrap() {
       transform: true, // aplica las transformaciones del DTO (como el trim)
     }),
   );
+
+  // Permite que la web (otro origen) llame a la API. CORS_ORIGIN: sin "/" final
+  app.enableCors({
+    origin: process.env.CORS_ORIGIN ?? 'http://localhost:5173',
+  });
 
   await app.listen(process.env.PORT ?? 3000);
 }
