@@ -19,6 +19,9 @@ async function bootstrap() {
     }),
   );
 
+  // Permite que la web (otro origen) llame a la API. CORS_ORIGIN: sin "/" final
+  app.enableCors({ origin: process.env.CORS_ORIGIN ?? 'http://localhost:5173' });
+
   await app.listen(process.env.PORT ?? 3000);
 }
 void bootstrap();
